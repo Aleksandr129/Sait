@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сотрудники</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/4.0.9/jquery.inputmask.bundle.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 2px solid #ddd;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #2185d0;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #91d4f5; 
+            transition: background-color 0.3s ease;
+        }
+            .btn-edit {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        .btn-edit:hover {
+            background-color: #d9251f;
+        }
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+        .dropbtn {
+            background-color: #007BFF;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown:hover .dropbtn {
+            background-color: #0eb3ff;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-content form {
+            max-width: 600px;
+            margin: auto;
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 1em;
+        }
+        .modal-content label {
+            display: block;
+            margin-top: 10px;
+        }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        .modal-content button {
+            padding: 10px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .modal-content button:hover {
+            background-color: #0056b3;
+        }
+        .profile-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 4px;
+        }
+        .profile-button:hover {
+            background-color: #0eb3ff;
+        }
+        .profile-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .profile-modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+        }
+        .profile-modal-content form div {
+            margin-bottom: 15px;
+        }
+        .profile-modal-content label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .profile-modal-content input[type="text"],
+        .profile-modal-content input[type="email"],
+        .profile-modal-content input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .logout-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .logout-button:hover {
+            background-color: #d9251f;
+        }
+        .add-button, .back-button, .phone-directory-button, .department-button, .position-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .add-button:hover, .back-button:hover, .phone-directory-button:hover, .department-button:hover, .position-button:hover {
+            background-color: #0eb3ff;
+        }
+        .edit-button {
+            background-color: #ffc107;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .edit-button:hover {
+            background-color: #e0a800;
+        }
+        #editPhotoPreview img {
+            cursor: pointer;
+        }
+        .department-button, .position-button {
+            position: relative;
+        }
+        .clear-filter {
+            color: red;
+            margin-left: 5px;
+            cursor: pointer;
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .department-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .department-list button {
+            padding: 8px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .department-list button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Сотрудники</h1>
+    <form action="/employees" method="get">
+        <label for="full_name">ФИО:</label>
+        <input type="text" name="full_name" id="full_name">
+        <input type="submit" value="Поиск">
+        <button type="button" class="add-button" onclick="window.location.href='/add_employee'">Добавить сотрудника</button>
+        <button type="button" class="phone-directory-button" onclick="window.location.href='/phone_directory'">Телефонный справочник</button>
+        <button type="button" class="back-button" onclick="window.location.href='/table'">Назад</button>
+        <div style="display: inline-block; vertical-align: middle;">
+            <button type="button" class="position-button" onclick="openPositionModal(event)">
+                <span id="positionButtonText">Должность</span>
+                <span id="clearPosition" class="clear-filter" style="display: none;" onclick="clearPositionFilter(event)">✕</span>
+            </button>
+        </div>
+        <div style="display: inline-block; vertical-align: middle;">
+            <button type="button" class="department-button" onclick="openDepartmentModal(event)">
+                <span id="departmentButtonText">Отдел</span>
+                <span id="clearDepartment" class="clear-filter" style="display: none;" onclick="clearDepartmentFilter(event)">✕</span>
+            </button>
+        </div>
+    </form>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Таб номер</th>
+            <th>ФИО</th>
+            <th>Дата рождения</th>
+            <th>Пол</th>
+            <th>Адрес</th>
+            <th>Почта</th>
+            <th>Серия и номер паспорта</th>
+            <th>СНИЛС</th>
+            <th>ИНН</th>
+            <th>Дата приема на работу</th>
+            <th>Должность</th>
+            <th>Отдел</th>
+            <th>Телефон</th>
+            <th>Фото</th>
+            <th>Действия</th>
+        </tr>
+        {% for employee in employees %}
+        <tr>
+            <td>{{ employee[0] }}</td>
+            <td>{{ employee[1] }}</td>
+            <td>{{ employee[2] }}</td>
+            <td>{{ employee[3] }}</td>
+            <td>{{ employee[4] }}</td>
+            <td>{{ employee[5] }}</td>
+            <td>{{ employee[6] }}</td>
+            <td>{{ employee[7] }}</td>
+            <td>{{ employee[8] }}</td>
+            <td>{{ employee[9] }}</td>
+            <td>{{ employee[10] }}</td>
+            <td>{{ employee[11] }}</td>
+            <td>{{ employee[12] }}</td>
+            <td>{{ employee[13] }}</td>
+            <td>
+                {% if employee[14] %}
+                <img src="{{ employee[14] }}" alt="Фото" style="max-width: 100px;">
+                {% else %}
+                Нет фото
+                {% endif %}
+            </td>
+            <td>
+                <button class="edit-button" onclick="openEditModal(this)">Редактировать</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeEditModal()">&times;</span>
+            <h2>Редактировать информацию о сотруднике</h2>
+            <form id="editForm" action="/edit_employee" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="employeeId" name="employee_id">
+                <input type="hidden" id="existingPhoto" name="existing_photo">
+                <label for="editEmployeeNumber">Табельный номер:</label>
+                <input type="text" id="editEmployeeNumber" name="employee_number" required>
+                <label for="editFullName">ФИО:</label>
+                <input type="text" id="editFullName" name="full_name" required>
+                <label for="editBirthDate">Дата рождения:</label>
+                <input type="date" id="editBirthDate" name="birth_date" required>
+                <label for="editGender">Пол:</label>
+                <select id="editGender" name="gender" required>
+                    <option value="м">Мужской</option>
+                    <option value="ж">Женский</option>
+                </select>
+                <label for="editAddress">Адрес:</label>
+                <input type="text" id="editAddress" name="address" required>
+                <label for="editEmail">Почта:</label>
+                <input type="email" id="editEmail" name="email" required>
+                <label for="editPassport">Серия и номер паспорта:</label>
+                <input type="text" id="editPassport" name="passport_series_number" required>
+                <label for="editSnils">СНИЛС:</label>
+                <input type="text" id="editSnils" name="snils" required>
+                <label for="editInn">ИНН:</label>
+                <input type="text" id="editInn" name="inn" required>
+                <label for="editHireDate">Дата приема на работу:</label>
+                <input type="date" id="editHireDate" name="hire_date" required>
+                <label for="editPosition">Должность:</label>
+                <select id="editPosition" name="position" required>
+                    <option value="Техник-программист">Техник-программист</option>
+                    <option value="Инженер-программист">Инженер-программист</option>
+                    <option value="Укладчик-упаковщик">Укладчик-упаковщик</option>
+                    <option value="Механик">Механик</option>
+                    <option value="Инженер-электроник">Инженер-электроник</option>
+                    <option value="Слесарь-сантехник">Слесарь-сантехник</option>
+                    <option value="Бухгалтер">Бухгалтер</option>
+                </select>
+                <label for="editDepartment">Отдел:</label>
+                <select id="editDepartment" name="department" required>
+                    <option value="ОИТ">ОИТ</option>
+                    <option value="Бухгалтерия">Бухгалтерия</option>
+                    <option value="Канцелярия">Канцелярия</option>
+                    <option value="КИП">КИП</option>
+                    <option value="КО">КО</option>
+                    <option value="МПС">МПС</option>
+                    <option value="ОГМ">ОГМ</option>
+                    <option value="ОГЭ">ОГЭ</option>
+                    <option value="ОЗ">ОЗ</option>
+                    <option value="ОК">ОК</option>
+                    <option value="ОЛ">ОЛ</option>
+                    <option value="ОП">ОП</option>
+                    <option value="ОПБ">ОПБ</option>
+                    <option value="ОР">ОР</option>
+                    <option value="ОТК">ОТК</option>
+                    <option value="ОУПС">ОУПС</option>
+                    <option value="Охрана">Охрана</option>
+                    <option value="ПСТ">ПСТ</option>
+                    <option value="ПТО">ПТО</option>
+                    <option value="Столовая">Столовая</option>
+                    <option value="ТЛК">ТЛК</option>
+                    <option value="ТЦ">ТЦ</option>
+                    <option value="УПП">УПП</option>
+                    <option value="УПУ">УПУ</option>
+                    <option value="УТОиР">УТОиР</option>
+                    <option value="УФК">УФК</option>
+                    <option value="УЗО">УЗО</option>
+                    <option value="ЦПШ">ЦПШ</option>
+                    <option value="ЭЛ">ЭЛ</option>
+                    <option value="ЭО">ЭО</option>
+                    <option value="ЮО">ЮО</option>
+                </select>
+                <label for="editPhone">Телефон:</label>
+                <input type="text" id="editPhone" name="phone" required>
+                <label for="editPhoto">Фото:</label>
+                <div id="editPhotoPreview" style="margin-bottom: 10px; text-align: center;">
+                    <img id="editPhotoImage" src="" alt="Фото" style="max-width: 100px; cursor: pointer;" onclick="triggerFileInput()">
+                </div>
+                <input type="file" id="editPhoto" name="photo" style="display: none;" onchange="updateFileName(this)">
+                <button type="submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <div id="departmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeDepartmentModal()">&times;</span>
+            <h2>Выберите отдел</h2>
+            <div class="department-list">
+                <button onclick="filterByDepartment('ОИТ')">ОИТ</button>
+                <button onclick="filterByDepartment('Бухгалтерия')">Бухгалтерия</button>
+                <button onclick="filterByDepartment('Канцелярия')">Канцелярия</button>
+                <button onclick="filterByDepartment('КИП')">КИП</button>
+                <button onclick="filterByDepartment('КО')">КО</button>
+                <button onclick="filterByDepartment('МПС')">МПС</button>
+                <button onclick="filterByDepartment('ОГМ')">ОГМ</button>
+                <button onclick="filterByDepartment('ОГЭ')">ОГЭ</button>
+                <button onclick="filterByDepartment('ОЗ')">ОЗ</button>
+                <button onclick="filterByDepartment('ОК')">ОК</button>
+                <button onclick="filterByDepartment('ОЛ')">ОЛ</button>
+                <button onclick="filterByDepartment('ОП')">ОП</button>
+                <button onclick="filterByDepartment('ОПБ')">ОПБ</button>
+                <button onclick="filterByDepartment('ОР')">ОР</button>
+                <button onclick="filterByDepartment('ОТК')">ОТК</button>
+                <button onclick="filterByDepartment('ОУПС')">ОУПС</button>
+                <button onclick="filterByDepartment('Охрана')">Охрана</button>
+                <button onclick="filterByDepartment('ПСТ')">ПСТ</button>
+                <button onclick="filterByDepartment('ПТО')">ПТО</button>
+                <button onclick="filterByDepartment('Столовая')">Столовая</button>
+                <button onclick="filterByDepartment('ТЛК')">ТЛК</button>
+                <button onclick="filterByDepartment('ТЦ')">ТЦ</button>
+                <button onclick="filterByDepartment('УПП')">УПП</button>
+                <button onclick="filterByDepartment('УПУ')">УПУ</button>
+                <button onclick="filterByDepartment('УТОиР')">УТОиР</button>
+                <button onclick="filterByDepartment('УФК')">УФК</button>
+                <button onclick="filterByDepartment('УЗО')">УЗО</button>
+                <button onclick="filterByDepartment('ЦПШ')">ЦПШ</button>
+                <button onclick="filterByDepartment('ЭЛ')">ЭЛ</button>
+                <button onclick="filterByDepartment('ЭО')">ЭО</button>
+                <button onclick="filterByDepartment('ЮО')">ЮО</button>
+            </div>
+        </div>
+    </div>
+    <div id="positionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closePositionModal()">&times;</span>
+            <h2>Выберите должность</h2>
+            <div class="department-list">
+                <button onclick="selectPosition('Техник-программист')">Техник-программист</button>
+                <button onclick="selectPosition('Инженер-программист')">Инженер-программист</button>
+                <button onclick="selectPosition('Укладчик-упаковщик')">Укладчик-упаковщик</button>
+                <button onclick="selectPosition('Механик')">Механик</button>
+                <button onclick="selectPosition('Инженер-электроник')">Инженер-электроник</button>
+                <button onclick="selectPosition('Слесарь-сантехник')">Слесарь-сантехник</button>
+                <button onclick="selectPosition('Бухгалтер')">Бухгалтер</button>
+            </div>
+        </div>
+    </div>
+    <div id="phoneDirectoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closePhoneDirectoryModal()">&times;</span>
+            <h2>Телефонный справочник</h2>
+            <table>
+                <tr>
+                    <th>Таб номер</th>
+                    <th>ФИО</th>
+                    <th>Должность</th>
+                    <th>Внутренний телефон</th>
+                    <th>Городской телефон</th>
+                    <th>Сотовый телефон</th>
+                    <th>Домашний телефон</th>
+                    <th>E-Mail</th>
+                    <th>Действия</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="editPhoneModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeEditPhoneModal()">&times;</span>
+            <h2>Изменить контактную информацию</h2>
+            <form id="editPhoneForm" action="/update_phone_number" method="post">
+                <input type="hidden" id="editEmployeeNumber" name="employee_number">
+                <label for="editFullName">ФИО:</label>
+                <input type="text" id="editFullName" name="full_name" required>
+                <label for="editPosition">Должность:</label>
+                <input type="text" id="editPosition" name="position" required>
+                <label for="editInternalPhone">Внутренний телефон:</label>
+                <input type="text" id="editInternalPhone" name="internal_phone">
+                <label for="editCityPhone">Городской телефон:</label>
+                <input type="text" id="editCityPhone" name="city_phone">
+                <label for="editMobilePhone">Сотовый телефон:</label>
+                <input type="text" id="editMobilePhone" name="mobile_phone">
+                <label for="editHomePhone">Домашний телефон:</label>
+                <input type="text" id="editHomePhone" name="home_phone">
+                <label for="editEmail">E-Mail:</label>
+                <input type="email" id="editEmail" name="email">
+                <button type="submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#editPhone').inputmask('+7 (999) 999-99-99');
+            $('#editPassport').inputmask('9999 999999');
+            $('#editSnils').inputmask('999-999-999 99');
+            $('#editInn').inputmask('999999999999');
+        });
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+        window.onload = function() {
+            const department = getQueryParam('department');
+            if (department) {
+                document.getElementById('departmentButtonText').textContent = department;
+                document.getElementById('clearDepartment').style.display = 'inline';
+            }
+            const position = getQueryParam('position');
+            if (position) {
+                document.getElementById('positionButtonText').textContent = position;
+                document.getElementById('clearPosition').style.display = 'inline';
+            }
+        };
+        function openEditModal(button) {
+            var row = button.closest('tr');
+            var employeeData = {
+                id: row.cells[0].innerText,
+                employeeNumber: row.cells[1].innerText,
+                fullName: row.cells[2].innerText,
+                birthDate: row.cells[3].innerText,
+                gender: row.cells[4].innerText,
+                address: row.cells[5].innerText,
+                email: row.cells[6].innerText,
+                passport: row.cells[7].innerText,
+                snils: row.cells[8].innerText,
+                inn: row.cells[9].innerText,
+                hireDate: row.cells[10].innerText,
+                position: row.cells[11].innerText,
+                department: row.cells[12].innerText,
+                phone: row.cells[13].innerText,
+                photo: row.cells[14].querySelector('img') ? row.cells[14].querySelector('img').src : ''
+            };
+            document.getElementById('editModal').style.display = 'block';
+            document.getElementById('employeeId').value = employeeData.id;
+            document.getElementById('editEmployeeNumber').value = employeeData.employeeNumber;
+            document.getElementById('editFullName').value = employeeData.fullName;
+            document.getElementById('editBirthDate').value = employeeData.birthDate;
+            document.getElementById('editGender').value = employeeData.gender;
+            document.getElementById('editAddress').value = employeeData.address;
+            document.getElementById('editEmail').value = employeeData.email;
+            document.getElementById('editPassport').value = employeeData.passport;
+            document.getElementById('editSnils').value = employeeData.snils;
+            document.getElementById('editInn').value = employeeData.inn;
+            document.getElementById('editHireDate').value = employeeData.hireDate;
+            document.getElementById('editPosition').value = employeeData.position;
+            document.getElementById('editDepartment').value = employeeData.department;
+            document.getElementById('editPhone').value = employeeData.phone;
+            document.getElementById('existingPhoto').value = employeeData.photo;
+            var photoPreview = document.getElementById('editPhotoPreview');
+            var photoImage = document.getElementById('editPhotoImage');
+            if (employeeData.photo) {
+                photoImage.src = employeeData.photo;
+            } else {
+                photoPreview.innerHTML = '<img id="editPhotoImage" src="" alt="Фото" style="max-width: 100px; cursor: pointer;" onclick="triggerFileInput()">';
+            }
+        }
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        function triggerFileInput() {
+            document.getElementById('editPhoto').click();
+        }
+        function openDepartmentModal(event) {
+            event.preventDefault();
+            document.getElementById('departmentModal').style.display = 'block';
+        }
+        function closeDepartmentModal() {
+            document.getElementById('departmentModal').style.display = 'none';
+        }
+        function filterByDepartment(department) {
+            document.getElementById('departmentButtonText').textContent = department;
+            document.getElementById('clearDepartment').style.display = 'inline';
+            window.location.href = `/employees?department=${encodeURIComponent(department)}`;
+            closeDepartmentModal();
+        }
+        function clearDepartmentFilter(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('departmentButtonText').textContent = 'Отдел';
+            document.getElementById('clearDepartment').style.display = 'none';
+            window.location.href = '/employees';
+        }
+        function openPositionModal(event) {
+            event.preventDefault();
+            document.getElementById('positionModal').style.display = 'block';
+        }
+        function closePositionModal() {
+            document.getElementById('positionModal').style.display = 'none';
+        }
+        function selectPosition(position) {
+            document.getElementById('positionButtonText').textContent = position;
+            document.getElementById('clearPosition').style.display = 'inline';
+            window.location.href = `/employees?position=${encodeURIComponent(position)}`;
+            closePositionModal();
+        }
+        function clearPositionFilter(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('positionButtonText').textContent = 'Должность';
+            document.getElementById('clearPosition').style.display = 'none';
+            window.location.href = '/employees';
+        }
+        function openPhoneDirectoryModal() {
+            fetch('/get_phone_directory')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#phoneDirectoryModal table');
+                    tableBody.innerHTML = `
+                        <tr>
+                            <th>Таб номер</th>
+                            <th>ФИО</th>
+                            <th>Должность</th>
+                            <th>Внутренний телефон</th>
+                            <th>Городской телефон</th>
+                            <th>Сотовый телефон</th>
+                            <th>Домашний телефон</th>
+                            <th>E-Mail</th>
+                            <th>Действия</th>
+                        </tr>
+                    `;
+                    data.forEach(entry => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${entry.employee_number}</td>
+                            <td>${entry.full_name}</td>
+                            <td>${entry.position}</td>
+                            <td>${entry.internal_phone}</td>
+                            <td>${entry.city_phone}</td>
+                            <td>${entry.mobile_phone}</td>
+                            <td>${entry.home_phone}</td>
+                            <td>${entry.email}</td>
+                            <td>
+                                <button class="edit-button" onclick="openEditPhoneModal('${entry.employee_number}')">Изменить</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Ошибка:', error));
+            document.getElementById('phoneDirectoryModal').style.display = 'block';
+        }
+
+        function closePhoneDirectoryModal() {
+            document.getElementById('phoneDirectoryModal').style.display = 'none';
+        }
+       function openEditPhoneModal(employeeNumber) {
+            fetch(`/get_phone_directory?employee_number=${employeeNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editEmployeeNumber').value = data.employee_number;
+                    document.getElementById('editFullName').value = data.full_name;
+                    document.getElementById('editPosition').value = data.position;
+                    document.getElementById('editInternalPhone').value = data.internal_phone;
+                    document.getElementById('editCityPhone').value = data.city_phone;
+                    document.getElementById('editMobilePhone').value = data.mobile_phone;
+                    document.getElementById('editHomePhone').value = data.home_phone;
+                    document.getElementById('editEmail').value = data.email;
+                })
+                .catch(error => console.error('Ошибка:', error));
+            document.getElementById('editPhoneModal').style.display = 'block';
+        }
+
+        function closeEditPhoneModal() {
+            document.getElementById('editPhoneModal').style.display = 'none';
+        }
+        function updateFileName(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('editPhotoImage').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>

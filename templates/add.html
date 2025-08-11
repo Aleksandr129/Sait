@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Добавить запись</title>
+    <style>
+        form {
+            max-width: 600px;
+            margin: auto;
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 1em;
+        }
+        div + div {
+            margin-top: 1em;
+        }
+        label {
+            display: inline-block;
+            width: 90px;
+            text-align: right;
+        }
+        input {
+            font: 1em sans-serif;
+            width: calc(100% - 100px);
+            box-sizing: border-box;
+            border: 1px solid #999;
+        }
+        input:focus {
+            border-color: #000;
+        }
+        button {
+            padding: 0.7em;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 250px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        h1 {
+            text-align: center
+        }
+        .to-main {
+            padding: 2.5px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            margin-left: 220px
+
+        }
+    </style>
+</head>
+<body>
+    <h1>Добавить новую запись</h1>
+    <form action="/add" method="post">
+        <div>
+            <label for="article">Артикул:</label>
+            <input type="text" id="article" name="article" required>
+        </div>
+        <div>
+            <label for="name">Наименование:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="color">Цвет:</label>
+            <input type="text" id="color" name="color" required>
+        </div>
+        <div>
+            <label for="row_count">Рядность:</label>
+            <input type="text" id="row_count" name="row_count" required>
+        </div>
+        <div>
+            <label for="count_in_row">Кол-во в ряду:</label>
+            <input type="text" id="count_in_row" name="count_in_row" required>
+        </div>
+        <div>
+            <label for="dimensions">Габариты:</label>
+            <input type="text" id="dimensions" name="dimensions" required>
+        </div>
+        <div>
+            <label for="mass">Масса:</label>
+            <input type="text" id="mass" name="mass" required>
+        </div>
+        <div>
+            <label for="production_date">Дата производства:</label>
+            <input type="date" id="production_date" name="production_date" required>
+        </div>
+        <div>
+            <label for="expiration_date">Срок годности:</label>
+            <input type="date" id="expiration_date" name="expiration_date" required>
+        </div>
+        <div>
+            <label for="storage_location">Участок хранения:</label>
+            <input type="text" id="storage_location" name="storage_location" required>
+        </div>
+        <div>
+            <label for="package_count">Кол-во П/П:</label>
+            <input type="text" id="package_count" name="package_count" required>
+        </div>
+        <div>
+            <label for="item_count">Кол-во изделий:</label>
+            <input type="text" id="item_count" name="item_count" required>
+        </div>
+        <div>
+            <label for="total_mass">Общая масса П/П:</label>
+            <input type="text" id="total_mass" name="total_mass" required>
+        </div>
+        <div>
+            <button type="submit">Добавить</button>
+            <a href="/table" class="to-main">Назад</a>
+        </div>
+    </form>
+</body>
+</html>

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Остатки</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/4.0.9/jquery.inputmask.bundle.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 2px solid #ddd;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #2185d0;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr.selected {
+            background-color: #d9edf7;
+        }
+        tr:hover {
+            background-color: #91d4f5; 
+            transition: background-color 0.3s ease; 
+        }
+        .btn-edit {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        .btn-edit:hover {
+            background-color: #d9251f;
+        }
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        .btn-delete:hover {
+            background-color: #d9251f;
+        }
+        .column-image {
+            max-width: 100px;
+        }
+        .column-price {
+            font-weight: bold;
+        }
+        @media only screen and (max-width: 768px) {
+            table {
+                font-size: 14px;
+            }
+        }
+        .add-button, .write-off-button, .add-quantity-button, .edit-button {
+            display: none;
+        }
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+        .dropbtn {
+            background-color: #007BFF;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown:hover .dropbtn {
+            background-color: #0eb3ff;
+        }
+        .edit-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .edit-modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+        }
+        .edit-modal-content form {
+            max-width: 600px;
+            margin: auto;
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 1em;
+        }
+        .edit-modal-content div {
+            margin-top: 1em;
+        }
+        .edit-modal-content label {
+            display: inline-block;
+            width: 200px;
+            text-align: right;
+        }
+        .edit-modal-content input {
+            font: 1em sans-serif;
+            width: calc(100% - 210px);
+            box-sizing: border-box;
+            border: 1px solid #999;
+        }
+        .edit-modal-content input:focus {
+            border-color: #000;
+        }
+        .edit-modal-content button {
+            padding: 0.7em;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 250px;
+        }
+        .edit-modal-content button:hover {
+            background-color: #0056b3;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .profile-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 4px;
+        }
+        .profile-button:hover {
+            background-color: #0eb3ff;
+        }
+        .profile-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .profile-modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 40%;
+        }
+        .profile-modal-content form div {
+            margin-bottom: 15px;
+        }
+        .profile-modal-content label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .profile-modal-content input[type="text"],
+        .profile-modal-content input[type="email"],
+        .profile-modal-content input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .logout-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .logout-button:hover {
+            background-color: #d9251f;
+        }
+        .employees-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 4px;
+        }
+        .employees-button:hover {
+            background-color: #0eb3ff;
+        }
+        #photoPreview {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Остатки</h1>
+    <form action="/table" method="get">
+        <label for="id">ID:</label>
+        <input type="text" name="id" id="id">
+        <label for="color">Цвет:</label>
+        <input type="text" name="color" id="color">
+        <input type="submit" value="Поиск">
+        <div class="dropdown">
+            <button class="dropbtn">Меню</button>
+            <div class="dropdown-content">
+                <a href="/add">Добавить запись</a>
+                <a href="#" onclick="openWriteOffModal()">Списать</a>
+                <a href="#" onclick="openAddQuantityModal()">Добавить количество</a>
+                <a href="#" onclick="openEditModal()">Редактировать</a>
+                <a href="#" onclick="deleteRecord()">Удалить</a>
+            </div>
+        </div>
+        <button type="button" class="profile-button" onclick="openProfileModal()">Профиль</button>
+        <a href="/employees"><button type="button" class="employees-button">Сотрудники</button></a>
+    </form>
+    <table>
+        <tr>
+            <th>ИД</th>
+            <th>Артикул</th>
+            <th>Конструкторское наименование</th>
+            <th>Цвет</th>
+            <th>Рядность</th>
+            <th>Кол-во в ряду</th>
+            <th>Глубина, ширина, высота</th>
+            <th>Масса</th>
+            <th>Дата производства</th>
+            <th>Срок годности до</th>
+            <th>Участок хранения</th>
+            <th>Кол-во П/П</th>
+            <th>Кол-во изделий</th>
+            <th>Общая масса П/П</th>
+        </tr>
+        {% for row in rows %}
+        <tr onclick="selectRow(this)" data-id="{{ row[0] }}" data-quantity="{{ row[12] }}">
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+            <td>{{ row[5] }}</td>
+            <td>{{ row[6] }}</td>
+            <td>{{ row[7] }}</td>
+            <td>{{ row[8] }}</td>
+            <td>{{ row[9] }}</td>
+            <td>{{ row[10] }}</td>
+            <td>{{ row[11] }}</td>
+            <td>{{ row[12] }}</td>
+            <td>{{ row[13] }}</td>
+        </tr>
+        {% endfor %}
+    </table> 
+    <div id="profileModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <span class="close-button" onclick="closeProfileModal()">&times;</span>
+            <h2>Профиль</h2>
+            <div id="profilePhoto" style="text-align: center; margin-bottom: 20px;"></div>
+            <div id="profileInfo" style="display: flex; flex-direction: column; align-items: flex-start;"></div>
+            <div>
+                <button id="addInfoButton" type="button" onclick="openAddInfoModal()">Добавить информацию</button>
+                <button id="logoutButton" type="button" class="logout-button" onclick="logout()">Выйти</button>
+            </div>
+        </div>
+    </div>
+    <div id="addInfoModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <span class="close-button" onclick="closeAddInfoModal()">&times;</span>
+            <h2>Редактировать профиль</h2>
+            <form id="addInfoForm" action="/api/profile" method="post" enctype="multipart/form-data">
+                <div>
+                    <label for="fullName">ФИО:</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div>
+                    <label for="email">Почта:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div>
+                    <label for="phone">Телефон:</label>
+                    <input type="text" id="phone" name="phone" required>
+                </div>
+                <div>
+                    <label for="photo">Фото:</label>
+                    <div id="photoPreview" style="margin-bottom: 10px; text-align: left; cursor: pointer;">
+                        <img id="profilePhotoPreview" src="" alt="Фото" style="max-width: 100px;" onclick="triggerFileInput()">
+                    </div>
+                    <input type="file" id="photo" name="photo" style="display: none;" onchange="updateFileName(this)">
+                    <input type="hidden" id="existingPhoto" name="existingPhoto">
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                    <button type="button" onclick="saveProfileInfo()">Сохранить</button>
+                    <button type="button" class="logout-button" onclick="closeAddInfoModal()">Назад</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="writeOffModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeWriteOffModal()">&times;</span>
+            <h2>Списание остатков</h2>
+            <form id="writeOffForm">
+                <label for="selectedRowId">Выбранная строка (ID):</label>
+                <input type="text" id="selectedRowId" name="selectedRowId" readonly>
+                <label for="availableQuantity">Доступное количество изделий:</label>
+                <input type="text" id="availableQuantity" name="availableQuantity" readonly>
+                <label for="writeOffQuantity">Количество для списания:</label>
+                <input type="number" id="writeOffQuantity" name="writeOffQuantity" required>
+                <button type="button" onclick="performWriteOff()">Списать</button>
+            </form>
+        </div>
+    </div>
+    <div id="addQuantityModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeAddQuantityModal()">&times;</span>
+            <h2>Добавить количество изделий</h2>
+            <form id="addQuantityForm">
+                <label for="selectedRowIdAdd">Выбранная строка (ID):</label>
+                <input type="text" id="selectedRowIdAdd" name="selectedRowIdAdd" readonly>
+                <label for="availableQuantityAdd">Доступное количество изделий:</label>
+                <input type="text" id="availableQuantityAdd" name="availableQuantityAdd" readonly>
+                <label for="addQuantity">Количество для добавления:</label>
+                <input type="number" id="addQuantity" name="addQuantity" required>
+                <button type="button" onclick="performAddQuantity()">Добавить</button>
+            </form>
+        </div>
+    </div>
+    <div id="editModal" class="edit-modal">
+        <div class="edit-modal-content">
+            <span class="close-button" onclick="closeEditModal()">&times;</span>
+            <h2>Редактировать запись</h2>
+            <form id="editForm">
+                <div>
+                    <label for="editArticul">Артикул:</label>
+                    <input type="text" id="editArticul" name="articul" required>
+                </div>
+                <div>
+                    <label for="editBuildName">Наименование:</label>
+                    <input type="text" id="editBuildName" name="name" required>
+                </div>
+                <div>
+                    <label for="editColor">Цвет:</label>
+                    <input type="text" id="editColor" name="color" required>
+                </div>
+                <div>
+                    <label for="editRowByRow">Рядность:</label>
+                    <input type="text" id="editRowByRow" name="row_by_row" required>
+                </div>
+                <div>
+                    <label for="editQuantityInRow">Кол-во в ряду:</label>
+                    <input type="text" id="editQuantityInRow" name="quantity_in_row" required>
+                </div>
+                <div>
+                    <label for="editDwh">Габариты:</label>
+                    <input type="text" id="editDwh" name="dwh" required>
+                </div>
+                <div>
+                    <label for="editMass">Масса:</label>
+                    <input type="text" id="editMass" name="mass" required>
+                </div>
+                <div>
+                    <label for="editProductionDate">Дата производства:</label>
+                    <input type="date" id="editProductionDate" name="production_date" required>
+                </div>
+                <div>
+                    <label for="editExpirationDate">Срок годности:</label>
+                    <input type="date" id="editExpirationDate" name="expiration_date" required>
+                </div>
+                <div>
+                    <label for="editStorageArea">Участок хранения:</label>
+                    <input type="text" id="editStorageArea" name="storage_area" required>
+                </div>
+                <div>
+                    <label for="editQuantityPP">Кол-во П/П:</label>
+                    <input type="text" id="editQuantityPP" name="quantity_pp" required>
+                </div>
+                <div>
+                    <label for="editQuantityProduction">Кол-во изделий:</label>
+                    <input type="text" id="editQuantityProduction" name="quantity_production" required>
+                </div>
+                <div>
+                    <label for="editTotalWeightPP">Общая масса П/П:</label>
+                    <input type="text" id="editTotalWeightPP" name="total_weight_pp" required>
+                </div>
+                <div>
+                    <button type="button" onclick="performEdit()">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#phone').inputmask('+7 (999) 999-99-99');
+        });
+        let selectedRow = null;
+        let currentUser = "{{ current_user }}";
+        function selectRow(row) {
+            if (selectedRow) {
+                selectedRow.classList.remove('selected');
+            }
+            row.classList.add('selected');
+            selectedRow = row;
+        }
+        function openWriteOffModal() {
+            if (selectedRow) {
+                document.getElementById('writeOffModal').style.display = 'block';
+                document.getElementById('selectedRowId').value = selectedRow.dataset.id;
+                document.getElementById('availableQuantity').value = selectedRow.dataset.quantity;
+                document.getElementById('writeOffQuantity').max = selectedRow.dataset.quantity;
+            } else {
+                alert('Пожалуйста, выберите строку для списания.');
+            }
+        }
+        function closeWriteOffModal() {
+            document.getElementById('writeOffModal').style.display = 'none';
+        }
+        function openAddQuantityModal() {
+            if (selectedRow) {
+                document.getElementById('addQuantityModal').style.display = 'block';
+                document.getElementById('selectedRowIdAdd').value = selectedRow.dataset.id;
+                document.getElementById('availableQuantityAdd').value = selectedRow.dataset.quantity;
+            } else {
+                alert('Пожалуйста, выберите строку для добавления количества.');
+            }
+        }
+        function closeAddQuantityModal() {
+            document.getElementById('addQuantityModal').style.display = 'none';
+        }
+        function openEditModal() {
+            if (selectedRow) {
+                document.getElementById('editModal').style.display = 'block';
+                const cells = selectedRow.cells;
+                document.getElementById('editArticul').value = cells[1].innerText;
+                document.getElementById('editBuildName').value = cells[2].innerText;
+                document.getElementById('editColor').value = cells[3].innerText;
+                document.getElementById('editRowByRow').value = cells[4].innerText;
+                document.getElementById('editQuantityInRow').value = cells[5].innerText;
+                document.getElementById('editDwh').value = cells[6].innerText;
+                document.getElementById('editMass').value = cells[7].innerText;
+                document.getElementById('editProductionDate').value = cells[8].innerText;
+                document.getElementById('editExpirationDate').value = cells[9].innerText;
+                document.getElementById('editStorageArea').value = cells[10].innerText;
+                document.getElementById('editQuantityPP').value = cells[11].innerText;
+                document.getElementById('editQuantityProduction').value = cells[12].innerText;
+                document.getElementById('editTotalWeightPP').value = cells[13].innerText;
+            } else {
+                alert('Пожалуйста, выберите строку для редактирования.');
+            }
+        }
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        function performWriteOff() {
+            const availableQuantity = parseInt(document.getElementById('availableQuantity').value);
+            const writeOffQuantity = parseInt(document.getElementById('writeOffQuantity').value);
+            const rowId = document.getElementById('selectedRowId').value;
+            if (writeOffQuantity > availableQuantity) {
+                alert('Количество для списания не может превышать допустимое количество изделий.');
+                return;
+            }
+            if (rowId && writeOffQuantity) {
+                fetch('/write_off', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        row_id: rowId,
+                        write_off_quantity: writeOffQuantity,
+                    }),
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Success:', data);
+                    closeWriteOffModal();
+                    location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+        function performAddQuantity() {
+            const rowId = document.getElementById('selectedRowIdAdd').value;
+            const addQuantity = parseInt(document.getElementById('addQuantity').value);
+            if (rowId && addQuantity) {
+                fetch('/add_quantity', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        row_id: rowId,
+                        add_quantity: addQuantity,
+                    }),
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Success:', data);
+                    closeAddQuantityModal();
+                    location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+        function performEdit() {
+            const articul = document.getElementById('editArticul').value;
+            const buildName = document.getElementById('editBuildName').value;
+            const color = document.getElementById('editColor').value;
+            const rowByRow = document.getElementById('editRowByRow').value;
+            const quantityInRow = document.getElementById('editQuantityInRow').value;
+            const dwh = document.getElementById('editDwh').value;
+            const mass = document.getElementById('editMass').value;
+            const productionDate = document.getElementById('editProductionDate').value;
+            const expirationDate = document.getElementById('editExpirationDate').value;
+            const storageArea = document.getElementById('editStorageArea').value;
+            const quantityPP = document.getElementById('editQuantityPP').value;
+            const quantityProduction = document.getElementById('editQuantityProduction').value;
+            const totalWeightPP = document.getElementById('editTotalWeightPP').value;
+            const rowId = selectedRow.dataset.id;
+            if (rowId) {
+                fetch('/edit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        row_id: rowId,
+                        articul: articul,
+                        build_name: buildName,
+                        color: color,
+                        row_by_row: rowByRow,
+                        quantity_in_row: quantityInRow,
+                        dwh: dwh,
+                        mass: mass,
+                        production_date: productionDate,
+                        expiration_date: expirationDate,
+                        storage_area: storageArea,
+                        quantity_pp: quantityPP,
+                        quantity_production: quantityProduction,
+                        total_weight_pp: totalWeightPP,
+                    }),
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Success:', data);
+                    closeEditModal();
+                    location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+        function openProfileModal() {
+            document.getElementById('profileModal').style.display = 'block';
+            fetchProfileInfo();
+        }
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+        function openAddInfoModal() {
+            fetch('/api/profile')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('fullName').value = data.full_name || '';
+                    document.getElementById('email').value = data.email || '';
+                    document.getElementById('phone').value = data.phone || '';
+                    var photoPreview = document.getElementById('photoPreview');
+                    if (data.photo) {
+                        photoPreview.innerHTML = '<img src="' + data.photo + '" alt="Фото" style="max-width: 100px;" onclick="triggerFileInput()">';
+                        document.getElementById('existingPhoto').value = data.photo;
+                    } else {
+                        photoPreview.innerHTML = '<img src="" alt="Фото" style="max-width: 100px;" onclick="triggerFileInput()">';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            document.getElementById('addInfoModal').style.display = 'block';
+        }
+        function closeAddInfoModal() {
+            document.getElementById('addInfoModal').style.display = 'none';
+        }
+        function fetchProfileInfo() {
+            fetch('/api/profile')
+                .then(response => response.json())
+                .then(data => {
+                    let profileInfoHTML = `<p><strong>Логин:</strong> ${currentUser || ''}</p>`;
+                    if (data.photo) {
+                        document.getElementById('profilePhoto').innerHTML = `
+                            <img src="${data.photo}" alt="Фото" style="max-width: 200px; border-radius: 50%;">
+                        `;
+                    }
+                    if (data.full_name || data.email || data.phone) {
+                        profileInfoHTML += `
+                            <p><strong>ФИО:</strong> ${data.full_name || ''}</p>
+                            <p><strong>Почта:</strong> ${data.email || ''}</p>
+                            <p><strong>Телефон:</strong> ${data.phone || ''}</p>
+                        `;
+                        document.getElementById('addInfoButton').innerText = 'Изменить информацию';
+                    } else {
+                        document.getElementById('addInfoButton').innerText = 'Добавить информацию';
+                    }
+                    document.getElementById('profileInfo').innerHTML = profileInfoHTML;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        function saveProfileInfo() {
+            const formData = new FormData(document.getElementById('addInfoForm'));
+            fetch('/api/profile', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                closeAddInfoModal();
+                fetchProfileInfo();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        function logout() {
+            window.location.href = '/login';
+        }
+        function deleteRecord() {
+            if (selectedRow) {
+                const rowId = selectedRow.dataset.id;
+                if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+                    fetch('/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            row_id: rowId,
+                        }),
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log('Success:', data);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }
+            } else {
+                alert('Пожалуйста, выберите строку для удаления.');
+            }
+        }
+        function triggerFileInput() {
+            document.getElementById('photo').click();
+        }
+        function updateFileName(input) {
+            var photoPreview = document.getElementById('photoPreview');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.innerHTML = `
+                        <img src="${e.target.result}" alt="Фото" style="max-width: 100px;" onclick="triggerFileInput()">
+                    `;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>
