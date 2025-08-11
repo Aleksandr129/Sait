@@ -766,7 +766,7 @@ def handle_profile():
             conn.commit()
             return jsonify({"message": "Профиль успешно обновлен"}), 200
         except Error as e:
-            return jsonify({"error": f"Ошибка базы данных: {e}"}), 500
+            return jsonify({"error": f"Ошибка базы: {e}"}), 500
         finally:
             cursor.close()
             conn.close()
