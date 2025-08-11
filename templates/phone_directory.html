@@ -29,7 +29,7 @@
             background-color: #f2f2f2;
         }
         tr:hover {
-            background-color: #91d4f5; 
+            background-color: #91d4f5;
             transition: background-color 0.3s ease;
         }
         .edit-button {
@@ -78,6 +78,36 @@
             text-decoration: none;
             cursor: pointer;
         }
+        .modal-content form {
+            max-width: 600px;
+            margin: auto;
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 1em;
+        }
+        .modal-content label {
+            display: block;
+            margin-top: 10px;
+        }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        .modal-content button {
+            padding: 10px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .modal-content button:hover {
+            background-color: #0056b3;
+        }
         .back-button, .add-button {
             background-color: #007BFF;
             color: white;
@@ -92,7 +122,7 @@
             cursor: pointer;
         }
         .back-button:hover, .add-button:hover {
-            background-color: #0eb3ff;
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -202,7 +232,6 @@
             $('#editHomePhone').inputmask('9-99-99');
             $('#addHomePhone').inputmask('9-99-99');
         });
-
         function openEditModal(employeeNumber, fullName, position, internalPhone, cityPhone, mobilePhone, homePhone, email) {
             document.getElementById('editEmployeeNumber').value = employeeNumber;
             document.getElementById('editFullName').value = fullName;
@@ -214,19 +243,15 @@
             document.getElementById('editEmail').value = email;
             document.getElementById('editModal').style.display = 'block';
         }
-
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
         }
-
         function openAddModal() {
             document.getElementById('addModal').style.display = 'block';
         }
-
         function closeAddModal() {
             document.getElementById('addModal').style.display = 'none';
         }
-
         function populateEmployeeData(employeeNumber) {
             fetch(`/get_employee_data?employee_number=${employeeNumber}`)
                 .then(response => response.json())
