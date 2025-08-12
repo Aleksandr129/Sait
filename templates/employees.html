@@ -29,10 +29,10 @@
             background-color: #f2f2f2;
         }
         tr:hover {
-            background-color: #91d4f5; 
+            background-color: #91d4f5;
             transition: background-color 0.3s ease;
         }
-            .btn-edit {
+        .btn-edit {
             background-color: #f44336;
             color: white;
             border: none;
@@ -92,26 +92,26 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0,0,0,0.5);
         }
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto;
+            margin: 10% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
+            width: 60%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .close-button {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
-        }
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
             cursor: pointer;
+        }
+        .close-button:hover {
+            color: black;
         }
         .modal-content form {
             max-width: 600px;
@@ -254,21 +254,32 @@
             top: 50%;
             transform: translateY(-50%);
         }
-        .department-list {
+        .department-list, .position-list {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 10px;
+            margin-top: 20px;
         }
-        .department-list button {
-            padding: 8px;
+        .department-list button, .position-list button {
+            padding: 10px;
             background-color: #007BFF;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .department-list button:hover {
+        .department-list button:hover, .position-list button:hover {
             background-color: #0056b3;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -431,6 +442,9 @@
         <div class="modal-content">
             <span class="close-button" onclick="closeDepartmentModal()">&times;</span>
             <h2>Выберите отдел</h2>
+            <div class="search-box">
+                <input type="text" id="departmentSearch" placeholder="Поиск отдела..." onkeyup="searchDepartment()">
+            </div>
             <div class="department-list">
                 <button onclick="filterByDepartment('ОИТ')">ОИТ</button>
                 <button onclick="filterByDepartment('Бухгалтерия')">Бухгалтерия</button>
@@ -470,7 +484,10 @@
         <div class="modal-content">
             <span class="close-button" onclick="closePositionModal()">&times;</span>
             <h2>Выберите должность</h2>
-            <div class="department-list">
+            <div class="search-box">
+                <input type="text" id="positionSearch" placeholder="Поиск должности..." onkeyup="searchPosition()">
+            </div>
+            <div class="position-list">
                 <button onclick="selectPosition('Техник-программист')">Техник-программист</button>
                 <button onclick="selectPosition('Инженер-программист')">Инженер-программист</button>
                 <button onclick="selectPosition('Укладчик-упаковщик')">Укладчик-упаковщик</button>
@@ -500,7 +517,6 @@
             </table>
         </div>
     </div>
-
     <div id="editPhoneModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeEditPhoneModal()">&times;</span>
@@ -525,7 +541,6 @@
             </form>
         </div>
     </div>
-
     <script>
         $(document).ready(function() {
             $('#editPhone').inputmask('+7 (999) 999-99-99');
@@ -533,10 +548,12 @@
             $('#editSnils').inputmask('999-999-999 99');
             $('#editInn').inputmask('999999999999');
         });
+
         function getQueryParam(param) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(param);
         }
+
         window.onload = function() {
             const department = getQueryParam('department');
             if (department) {
@@ -549,6 +566,7 @@
                 document.getElementById('clearPosition').style.display = 'inline';
             }
         };
+
         function openEditModal(button) {
             var row = button.closest('tr');
             var employeeData = {
@@ -592,25 +610,31 @@
                 photoPreview.innerHTML = '<img id="editPhotoImage" src="" alt="Фото" style="max-width: 100px; cursor: pointer;" onclick="triggerFileInput()">';
             }
         }
+
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
         }
+
         function triggerFileInput() {
             document.getElementById('editPhoto').click();
         }
+
         function openDepartmentModal(event) {
             event.preventDefault();
             document.getElementById('departmentModal').style.display = 'block';
         }
+
         function closeDepartmentModal() {
             document.getElementById('departmentModal').style.display = 'none';
         }
+
         function filterByDepartment(department) {
             document.getElementById('departmentButtonText').textContent = department;
             document.getElementById('clearDepartment').style.display = 'inline';
             window.location.href = `/employees?department=${encodeURIComponent(department)}`;
             closeDepartmentModal();
         }
+
         function clearDepartmentFilter(event) {
             event.preventDefault();
             event.stopPropagation();
@@ -618,19 +642,23 @@
             document.getElementById('clearDepartment').style.display = 'none';
             window.location.href = '/employees';
         }
+
         function openPositionModal(event) {
             event.preventDefault();
             document.getElementById('positionModal').style.display = 'block';
         }
+
         function closePositionModal() {
             document.getElementById('positionModal').style.display = 'none';
         }
+
         function selectPosition(position) {
             document.getElementById('positionButtonText').textContent = position;
             document.getElementById('clearPosition').style.display = 'inline';
             window.location.href = `/employees?position=${encodeURIComponent(position)}`;
             closePositionModal();
         }
+
         function clearPositionFilter(event) {
             event.preventDefault();
             event.stopPropagation();
@@ -638,6 +666,7 @@
             document.getElementById('clearPosition').style.display = 'none';
             window.location.href = '/employees';
         }
+
         function openPhoneDirectoryModal() {
             fetch('/get_phone_directory')
                 .then(response => response.json())
@@ -681,7 +710,8 @@
         function closePhoneDirectoryModal() {
             document.getElementById('phoneDirectoryModal').style.display = 'none';
         }
-       function openEditPhoneModal(employeeNumber) {
+
+        function openEditPhoneModal(employeeNumber) {
             fetch(`/get_phone_directory?employee_number=${employeeNumber}`)
                 .then(response => response.json())
                 .then(data => {
@@ -701,6 +731,7 @@
         function closeEditPhoneModal() {
             document.getElementById('editPhoneModal').style.display = 'none';
         }
+
         function updateFileName(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -709,6 +740,36 @@
                 }
                 reader.readAsDataURL(input.files[0]);
             }
+        }
+
+        function searchDepartment() {
+            const input = document.getElementById('departmentSearch');
+            const filter = input.value.toUpperCase();
+            const buttons = document.querySelectorAll('.department-list button');
+
+            buttons.forEach(button => {
+                const text = button.textContent || button.innerText;
+                if (text.toUpperCase().indexOf(filter) > -1) {
+                    button.style.display = "";
+                } else {
+                    button.style.display = "none";
+                }
+            });
+        }
+
+        function searchPosition() {
+            const input = document.getElementById('positionSearch');
+            const filter = input.value.toUpperCase();
+            const buttons = document.querySelectorAll('.position-list button');
+
+            buttons.forEach(button => {
+                const text = button.textContent || button.innerText;
+                if (text.toUpperCase().indexOf(filter) > -1) {
+                    button.style.display = "";
+                } else {
+                    button.style.display = "none";
+                }
+            });
         }
     </script>
 </body>
