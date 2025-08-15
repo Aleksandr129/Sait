@@ -5,18 +5,61 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/4.0.9/jquery.inputmask.bundle.min.js"></script>
     <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        form[action="/table"] {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        form[action="/table"] label {
+            font-weight: 600;
+            color: #444;
+        }
+        form[action="/table"] input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: auto;
+        }
+        form[action="/table"] input[type="submit"] {
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        form[action="/table"] input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
         table {
             border-collapse: collapse;
             width: 100%;
             border: 2px solid #ddd;
             font-family: Arial, sans-serif;
-        }
-        h1 {
-            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
         }
         th, td {
-            border: 1px solid black;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: center;
         }
         th {
@@ -24,73 +67,60 @@
             color: white;
             font-weight: bold;
             text-transform: uppercase;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+        }
+        tr {
+            transition: all 0.2s ease;
         }
         tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        tr.selected {
-            background-color: #d9edf7;
+            background-color: #f8f9fa;
         }
         tr:hover {
-            background-color: #91d4f5; 
-            transition: background-color 0.3s ease; 
+            background-color: #91d4f5;
+            transform: scale(1.01);
         }
-        .btn-edit {
-            background-color: #f44336;
-            color: white;
+        tr.selected {
+            background-color: #bbdefb;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { background-color: #bbdefb; }
+            50% { background-color: #90caf9; }
+            100% { background-color: #bbdefb; }
+        }
+        .btn-edit, .btn-delete, .dropbtn, .profile-button, .employees-button, .logout-button {
             border: none;
             padding: 8px 16px;
             text-align: center;
             text-decoration: none;
-            display: inline-block;
             font-size: 14px;
             margin: 4px 2px;
             cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        .btn-edit:hover {
-            background-color: #d9251f;
-        }
-        .btn-delete {
+        .btn-edit, .btn-delete, .logout-button {
             background-color: #f44336;
             color: white;
-            border: none;
-            padding: 8px 16px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            margin: 4px 2px;
-            cursor: pointer;
         }
-        .btn-delete:hover {
+        .btn-edit:hover, .btn-delete:hover, .logout-button:hover {
             background-color: #d9251f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
-        .column-image {
-            max-width: 100px;
+        .dropbtn, .profile-button, .employees-button {
+            background-color: #007BFF;
+            color: white;
         }
-        .column-price {
-            font-weight: bold;
-        }
-        @media only screen and (max-width: 768px) {
-            table {
-                font-size: 14px;
-            }
-        }
-        .add-button, .write-off-button, .add-quantity-button, .edit-button {
-            display: none;
+        .dropbtn:hover, .profile-button:hover, .employees-button:hover {
+            background-color: #0eb3ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         .dropdown {
             display: inline-block;
             position: relative;
-        }
-        .dropbtn {
-            background-color: #007BFF;
-            color: white;
-            padding: 8px 16px;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
         }
         .dropdown-content {
             display: none;
@@ -99,190 +129,149 @@
             min-width: 160px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 1;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            transform-origin: top;
+            opacity: 0;
+            visibility: hidden;
         }
         .dropdown-content a {
             color: black;
             padding: 12px 16px;
             text-decoration: none;
             display: block;
+            transition: background-color 0.2s;
         }
         .dropdown-content a:hover {
             background-color: #f1f1f1;
         }
         .dropdown:hover .dropdown-content {
             display: block;
+            opacity: 1;
+            visibility: visible;
+            transform: scaleY(1);
         }
-        .dropdown:hover .dropbtn {
-            background-color: #0eb3ff;
-        }
-        .edit-modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .edit-modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 60%;
-        }
-        .edit-modal-content form {
-            max-width: 600px;
-            margin: auto;
-            padding: 1em;
+        form input[type="text"], form input[type="email"], form input[type="number"], form input[type="date"] {
+            transition: border-color 0.3s, box-shadow 0.3s;
             border: 1px solid #ccc;
-            border-radius: 1em;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 0 5px;
         }
-        .edit-modal-content div {
-            margin-top: 1em;
+        form input:focus {
+            border-color: #2185d0;
+            box-shadow: 0 0 5px rgba(33, 133, 208, 0.5);
+            outline: none;
         }
-        .edit-modal-content label {
-            display: inline-block;
-            width: 200px;
-            text-align: right;
-        }
-        .edit-modal-content input {
-            font: 1em sans-serif;
-            width: calc(100% - 210px);
-            box-sizing: border-box;
-            border: 1px solid #999;
-        }
-        .edit-modal-content input:focus {
-            border-color: #000;
-        }
-        .edit-modal-content button {
-            padding: 0.7em;
-            color: #fff;
-            background-color: #007BFF;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 250px;
-        }
-        .edit-modal-content button:hover {
-            background-color: #0056b3;
-        }
-        .modal {
+        .modal, .edit-modal, .profile-modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s ease-out;
         }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content, .edit-modal-content, .profile-modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            width: 50%;
+            max-width: 600px;
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); }
+            to { transform: translateY(0); }
         }
         .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
             font-weight: bold;
-        }
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
+            color: #888;
             cursor: pointer;
+            transition: color 0.2s;
         }
-        .profile-button {
-            display: inline-block;
-            padding: 8px 16px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            font-size: 14px;
-            margin: 4px 2px;
-            border-radius: 4px;
+        .close-button:hover {
+            color: #333;
         }
-        .profile-button:hover {
-            background-color: #0eb3ff;
+        .modal-form, .edit-modal-form, .profile-modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
-        .profile-modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .profile-modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 40%;
-        }
-        .profile-modal-content form div {
-            margin-bottom: 15px;
-        }
-        .profile-modal-content label {
-            display: block;
+        .modal-form label, .edit-modal-form label, .profile-modal-form label {
+            font-weight: 600;
+            color: #444;
             margin-bottom: 5px;
+            display: block;
         }
-        .profile-modal-content input[type="text"],
-        .profile-modal-content input[type="email"],
-        .profile-modal-content input[type="file"] {
+        .modal-form input, .edit-modal-form input, .profile-modal-form input {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
             width: 100%;
-            padding: 8px;
             box-sizing: border-box;
         }
-        .logout-button {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            margin: 4px 2px;
-            border-radius: 4px;
-            cursor: pointer;
+        .modal-form input:focus, .edit-modal-form input:focus, .profile-modal-form input:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+            outline: none;
         }
-        .logout-button:hover {
-            background-color: #d9251f;
-        }
-        .employees-button {
-            display: inline-block;
-            padding: 8px 16px;
+        .modal-button, .edit-modal-button {
             background-color: #007BFF;
             color: white;
             border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 15px;
             cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            font-size: 14px;
-            margin: 4px 2px;
-            border-radius: 4px;
+            transition: background-color 0.2s, transform 0.1s;
+            align-self: flex-end;
+            margin-top: 10px;
         }
-        .employees-button:hover {
-            background-color: #0eb3ff;
+        .modal-button:hover, .edit-modal-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
         }
-        #photoPreview {
-            margin-bottom: 10px;
-            text-align: left;
+        #writeOffModal .modal-content, #addQuantityModal .modal-content {
+            width: 40%;
+        }
+        #editModal .edit-modal-content {
+            width: 60%;
+        }
+        #profileModal .profile-modal-content {
+            width: 40%;
+        }
+        #profilePhoto img {
+            max-width: 120px;
+            border-radius: 50%;
+            border: 3px solid #007BFF;
+            transition: transform 0.3s;
+            display: block;
+            margin: 0 auto 15px;
+        }
+        #profilePhoto img:hover {
+            transform: scale(1.05);
+        }
+        #editForm > div {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
     </style>
 </head>
@@ -342,15 +331,121 @@
             <td>{{ row[13] }}</td>
         </tr>
         {% endfor %}
-    </table> 
+    </table>
+    <div id="writeOffModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeWriteOffModal()">&times;</span>
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Списание остатков</h2>
+            <form id="writeOffForm" class="modal-form">
+                <div>
+                    <label for="selectedRowId">ID записи:</label>
+                    <input type="text" id="selectedRowId" name="selectedRowId" readonly style="background-color: #f5f5f5;">
+                </div>
+                <div>
+                    <label for="availableQuantity">Доступное количество:</label>
+                    <input type="text" id="availableQuantity" name="availableQuantity" readonly style="background-color: #f5f5f5;">
+                </div>
+                <div>
+                    <label for="writeOffQuantity">Количество для списания:</label>
+                    <input type="number" id="writeOffQuantity" name="writeOffQuantity" required min="1">
+                </div>
+                <button type="button" class="modal-button" onclick="performWriteOff()">Списать</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addQuantityModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeAddQuantityModal()">&times;</span>
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Добавить количество</h2>
+            <form id="addQuantityForm" class="modal-form">
+                <div>
+                    <label for="selectedRowIdAdd">ID записи:</label>
+                    <input type="text" id="selectedRowIdAdd" name="selectedRowIdAdd" readonly style="background-color: #f5f5f5;">
+                </div>
+                <div>
+                    <label for="availableQuantityAdd">Текущее количество:</label>
+                    <input type="text" id="availableQuantityAdd" name="availableQuantityAdd" readonly style="background-color: #f5f5f5;">
+                </div>
+                <div>
+                    <label for="addQuantity">Количество для добавления:</label>
+                    <input type="number" id="addQuantity" name="addQuantity" required min="1">
+                </div>
+                <button type="button" class="modal-button" onclick="performAddQuantity()">Добавить</button>
+            </form>
+        </div>
+    </div>
+    <div id="editModal" class="edit-modal">
+        <div class="edit-modal-content">
+            <span class="close-button" onclick="closeEditModal()">&times;</span>
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Редактировать запись</h2>
+            <form id="editForm" class="edit-modal-form">
+                <div>
+                    <div>
+                        <label for="editArticul">Артикул:</label>
+                        <input type="text" id="editArticul" name="articul" required>
+                    </div>
+                    <div>
+                        <label for="editBuildName">Наименование:</label>
+                        <input type="text" id="editBuildName" name="name" required>
+                    </div>
+                    <div>
+                        <label for="editColor">Цвет:</label>
+                        <input type="text" id="editColor" name="color" required>
+                    </div>
+                    <div>
+                        <label for="editRowByRow">Рядность:</label>
+                        <input type="text" id="editRowByRow" name="row_by_row" required>
+                    </div>
+                    <div>
+                        <label for="editQuantityInRow">Кол-во в ряду:</label>
+                        <input type="text" id="editQuantityInRow" name="quantity_in_row" required>
+                    </div>
+                    <div>
+                        <label for="editDwh">Габариты:</label>
+                        <input type="text" id="editDwh" name="dwh" required>
+                    </div>
+                    <div>
+                        <label for="editMass">Масса:</label>
+                        <input type="text" id="editMass" name="mass" required>
+                    </div>
+                    <div>
+                        <label for="editProductionDate">Дата производства:</label>
+                        <input type="date" id="editProductionDate" name="production_date" required>
+                    </div>
+                    <div>
+                        <label for="editExpirationDate">Срок годности:</label>
+                        <input type="date" id="editExpirationDate" name="expiration_date" required>
+                    </div>
+                    <div>
+                        <label for="editStorageArea">Участок хранения:</label>
+                        <input type="text" id="editStorageArea" name="storage_area" required>
+                    </div>
+                    <div>
+                        <label for="editQuantityPP">Кол-во П/П:</label>
+                        <input type="text" id="editQuantityPP" name="quantity_pp" required>
+                    </div>
+                    <div>
+                        <label for="editQuantityProduction">Кол-во изделий:</label>
+                        <input type="text" id="editQuantityProduction" name="quantity_production" required>
+                    </div>
+                    <div>
+                        <label for="editTotalWeightPP">Общая масса П/П:</label>
+                        <input type="text" id="editTotalWeightPP" name="total_weight_pp" required>
+                    </div>
+                </div>
+                <button type="button" class="edit-modal-button" onclick="performEdit()">Сохранить</button>
+            </form>
+        </div>
+    </div>
     <div id="profileModal" class="profile-modal">
         <div class="profile-modal-content">
             <span class="close-button" onclick="closeProfileModal()">&times;</span>
-            <h2>Профиль</h2>
-            <div id="profilePhoto" style="text-align: center; margin-bottom: 20px;"></div>
-            <div id="profileInfo" style="display: flex; flex-direction: column; align-items: flex-start;"></div>
-            <div>
-                <button id="addInfoButton" type="button" onclick="openAddInfoModal()">Добавить информацию</button>
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Профиль</h2>
+            <div id="profilePhoto"></div>
+            <div id="profileInfo" style="text-align: center; margin-bottom: 20px;"></div>
+            <div style="text-align: center;">
+                <button id="addInfoButton" type="button" class="profile-button" onclick="openAddInfoModal()">Редактировать профиль</button>
                 <button id="logoutButton" type="button" class="logout-button" onclick="logout()">Выйти</button>
             </div>
         </div>
@@ -358,8 +453,8 @@
     <div id="addInfoModal" class="profile-modal">
         <div class="profile-modal-content">
             <span class="close-button" onclick="closeAddInfoModal()">&times;</span>
-            <h2>Редактировать профиль</h2>
-            <form id="addInfoForm" action="/api/profile" method="post" enctype="multipart/form-data">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Редактировать профиль</h2>
+            <form id="addInfoForm" class="profile-modal-form" action="/api/profile" method="post" enctype="multipart/form-data">
                 <div>
                     <label for="fullName">ФИО:</label>
                     <input type="text" id="fullName" name="fullName" required>
@@ -374,108 +469,15 @@
                 </div>
                 <div>
                     <label for="photo">Фото:</label>
-                    <div id="photoPreview" style="margin-bottom: 10px; text-align: left; cursor: pointer;">
-                        <img id="profilePhotoPreview" src="" alt="Фото" style="max-width: 100px;" onclick="triggerFileInput()">
+                    <div id="photoPreview" style="margin: 10px 0; text-align: center;">
+                        <img id="profilePhotoPreview" src="" alt="Фото" style="max-width: 120px; border-radius: 50%; border: 2px solid #007BFF; cursor: pointer;" onclick="triggerFileInput()">
                     </div>
                     <input type="file" id="photo" name="photo" style="display: none;" onchange="updateFileName(this)">
                     <input type="hidden" id="existingPhoto" name="existingPhoto">
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                    <button type="button" onclick="saveProfileInfo()">Сохранить</button>
-                    <button type="button" class="logout-button" onclick="closeAddInfoModal()">Назад</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div id="writeOffModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeWriteOffModal()">&times;</span>
-            <h2>Списание остатков</h2>
-            <form id="writeOffForm">
-                <label for="selectedRowId">Выбранная строка (ID):</label>
-                <input type="text" id="selectedRowId" name="selectedRowId" readonly>
-                <label for="availableQuantity">Доступное количество изделий:</label>
-                <input type="text" id="availableQuantity" name="availableQuantity" readonly>
-                <label for="writeOffQuantity">Количество для списания:</label>
-                <input type="number" id="writeOffQuantity" name="writeOffQuantity" required>
-                <button type="button" onclick="performWriteOff()">Списать</button>
-            </form>
-        </div>
-    </div>
-    <div id="addQuantityModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeAddQuantityModal()">&times;</span>
-            <h2>Добавить количество изделий</h2>
-            <form id="addQuantityForm">
-                <label for="selectedRowIdAdd">Выбранная строка (ID):</label>
-                <input type="text" id="selectedRowIdAdd" name="selectedRowIdAdd" readonly>
-                <label for="availableQuantityAdd">Доступное количество изделий:</label>
-                <input type="text" id="availableQuantityAdd" name="availableQuantityAdd" readonly>
-                <label for="addQuantity">Количество для добавления:</label>
-                <input type="number" id="addQuantity" name="addQuantity" required>
-                <button type="button" onclick="performAddQuantity()">Добавить</button>
-            </form>
-        </div>
-    </div>
-    <div id="editModal" class="edit-modal">
-        <div class="edit-modal-content">
-            <span class="close-button" onclick="closeEditModal()">&times;</span>
-            <h2>Редактировать запись</h2>
-            <form id="editForm">
-                <div>
-                    <label for="editArticul">Артикул:</label>
-                    <input type="text" id="editArticul" name="articul" required>
-                </div>
-                <div>
-                    <label for="editBuildName">Наименование:</label>
-                    <input type="text" id="editBuildName" name="name" required>
-                </div>
-                <div>
-                    <label for="editColor">Цвет:</label>
-                    <input type="text" id="editColor" name="color" required>
-                </div>
-                <div>
-                    <label for="editRowByRow">Рядность:</label>
-                    <input type="text" id="editRowByRow" name="row_by_row" required>
-                </div>
-                <div>
-                    <label for="editQuantityInRow">Кол-во в ряду:</label>
-                    <input type="text" id="editQuantityInRow" name="quantity_in_row" required>
-                </div>
-                <div>
-                    <label for="editDwh">Габариты:</label>
-                    <input type="text" id="editDwh" name="dwh" required>
-                </div>
-                <div>
-                    <label for="editMass">Масса:</label>
-                    <input type="text" id="editMass" name="mass" required>
-                </div>
-                <div>
-                    <label for="editProductionDate">Дата производства:</label>
-                    <input type="date" id="editProductionDate" name="production_date" required>
-                </div>
-                <div>
-                    <label for="editExpirationDate">Срок годности:</label>
-                    <input type="date" id="editExpirationDate" name="expiration_date" required>
-                </div>
-                <div>
-                    <label for="editStorageArea">Участок хранения:</label>
-                    <input type="text" id="editStorageArea" name="storage_area" required>
-                </div>
-                <div>
-                    <label for="editQuantityPP">Кол-во П/П:</label>
-                    <input type="text" id="editQuantityPP" name="quantity_pp" required>
-                </div>
-                <div>
-                    <label for="editQuantityProduction">Кол-во изделий:</label>
-                    <input type="text" id="editQuantityProduction" name="quantity_production" required>
-                </div>
-                <div>
-                    <label for="editTotalWeightPP">Общая масса П/П:</label>
-                    <input type="text" id="editTotalWeightPP" name="total_weight_pp" required>
-                </div>
-                <div>
-                    <button type="button" onclick="performEdit()">Сохранить</button>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="button" class="profile-button" onclick="saveProfileInfo()">Сохранить</button>
+                    <button type="button" class="logout-button" onclick="closeAddInfoModal()">Отмена</button>
                 </div>
             </form>
         </div>
@@ -486,6 +488,7 @@
         });
         let selectedRow = null;
         let currentUser = "{{ current_user }}";
+
         function selectRow(row) {
             if (selectedRow) {
                 selectedRow.classList.remove('selected');
@@ -493,6 +496,7 @@
             row.classList.add('selected');
             selectedRow = row;
         }
+
         function openWriteOffModal() {
             if (selectedRow) {
                 document.getElementById('writeOffModal').style.display = 'block';
@@ -503,9 +507,11 @@
                 alert('Пожалуйста, выберите строку для списания.');
             }
         }
+
         function closeWriteOffModal() {
             document.getElementById('writeOffModal').style.display = 'none';
         }
+
         function openAddQuantityModal() {
             if (selectedRow) {
                 document.getElementById('addQuantityModal').style.display = 'block';
@@ -515,9 +521,11 @@
                 alert('Пожалуйста, выберите строку для добавления количества.');
             }
         }
+
         function closeAddQuantityModal() {
             document.getElementById('addQuantityModal').style.display = 'none';
         }
+
         function openEditModal() {
             if (selectedRow) {
                 document.getElementById('editModal').style.display = 'block';
@@ -539,15 +547,17 @@
                 alert('Пожалуйста, выберите строку для редактирования.');
             }
         }
+
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
         }
+
         function performWriteOff() {
             const availableQuantity = parseInt(document.getElementById('availableQuantity').value);
             const writeOffQuantity = parseInt(document.getElementById('writeOffQuantity').value);
             const rowId = document.getElementById('selectedRowId').value;
             if (writeOffQuantity > availableQuantity) {
-                alert('Количество для списания не может превышать допустимое количество изделий.');
+                alert('Количество для списания не может превышать доступное количество изделий.');
                 return;
             }
             if (rowId && writeOffQuantity) {
@@ -572,6 +582,7 @@
                 });
             }
         }
+
         function performAddQuantity() {
             const rowId = document.getElementById('selectedRowIdAdd').value;
             const addQuantity = parseInt(document.getElementById('addQuantity').value);
@@ -597,6 +608,7 @@
                 });
             }
         }
+
         function performEdit() {
             const articul = document.getElementById('editArticul').value;
             const buildName = document.getElementById('editBuildName').value;
@@ -646,13 +658,16 @@
                 });
             }
         }
+
         function openProfileModal() {
             document.getElementById('profileModal').style.display = 'block';
             fetchProfileInfo();
         }
+
         function closeProfileModal() {
             document.getElementById('profileModal').style.display = 'none';
         }
+
         function openAddInfoModal() {
             fetch('/api/profile')
                 .then(response => response.json())
@@ -662,18 +677,20 @@
                     document.getElementById('phone').value = data.phone || '';
                     var photoPreview = document.getElementById('photoPreview');
                     if (data.photo) {
-                        photoPreview.innerHTML = '<img src="' + data.photo + '" alt="Фото" style="max-width: 100px;" onclick="triggerFileInput()">';
+                        photoPreview.innerHTML = '<img src="' + data.photo + '" alt="Фото" style="max-width: 120px; border-radius: 50%; border: 2px solid #007BFF; cursor: pointer;" onclick="triggerFileInput()">';
                         document.getElementById('existingPhoto').value = data.photo;
                     } else {
-                        photoPreview.innerHTML = '<img src="" alt="Фото" style="max-width: 100px;" onclick="triggerFileInput()">';
+                        photoPreview.innerHTML = '<img src="" alt="Фото" style="max-width: 120px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer;" onclick="triggerFileInput()">';
                     }
                 })
                 .catch(error => console.error('Error:', error));
             document.getElementById('addInfoModal').style.display = 'block';
         }
+
         function closeAddInfoModal() {
             document.getElementById('addInfoModal').style.display = 'none';
         }
+
         function fetchProfileInfo() {
             fetch('/api/profile')
                 .then(response => response.json())
@@ -681,7 +698,7 @@
                     let profileInfoHTML = `<p><strong>Логин:</strong> ${currentUser || ''}</p>`;
                     if (data.photo) {
                         document.getElementById('profilePhoto').innerHTML = `
-                            <img src="${data.photo}" alt="Фото" style="max-width: 200px; border-radius: 50%;">
+                            <img src="${data.photo}" alt="Фото" style="max-width: 120px; border-radius: 50%; border: 2px solid #007BFF;">
                         `;
                     }
                     if (data.full_name || data.email || data.phone) {
@@ -690,7 +707,7 @@
                             <p><strong>Почта:</strong> ${data.email || ''}</p>
                             <p><strong>Телефон:</strong> ${data.phone || ''}</p>
                         `;
-                        document.getElementById('addInfoButton').innerText = 'Изменить информацию';
+                        document.getElementById('addInfoButton').innerText = 'Редактировать профиль';
                     } else {
                         document.getElementById('addInfoButton').innerText = 'Добавить информацию';
                     }
@@ -698,6 +715,7 @@
                 })
                 .catch(error => console.error('Error:', error));
         }
+
         function saveProfileInfo() {
             const formData = new FormData(document.getElementById('addInfoForm'));
             fetch('/api/profile', {
@@ -712,9 +730,11 @@
             })
             .catch(error => console.error('Error:', error));
         }
+
         function logout() {
             window.location.href = '/login';
         }
+
         function deleteRecord() {
             if (selectedRow) {
                 const rowId = selectedRow.dataset.id;
@@ -741,16 +761,18 @@
                 alert('Пожалуйста, выберите строку для удаления.');
             }
         }
+
         function triggerFileInput() {
             document.getElementById('photo').click();
         }
+
         function updateFileName(input) {
             var photoPreview = document.getElementById('photoPreview');
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
                     photoPreview.innerHTML = `
-                        <img src="${e.target.result}" alt="Фото" style="max-width: 100px;" onclick="triggerFileInput()">
+                        <img src="${e.target.result}" alt="Фото" style="max-width: 120px; border-radius: 50%; border: 2px solid #007BFF; cursor: pointer;" onclick="triggerFileInput()">
                     `;
                 }
                 reader.readAsDataURL(input.files[0]);

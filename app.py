@@ -353,6 +353,63 @@ def add_phone_directory():
         cursor.close()
         conn.close()
 
+@app.route('/update_phone_directory', methods=['POST'])
+def update_phone_directory():
+    if not session.get('token') or not verify_token(session.get('token')):
+        return redirect('/login')
+
+    employee_number = request.form.get('employee_number', '').strip()
+    full_name = request.form.get('full_name', '')
+    position = request.form.get('position', '')
+    internal_phone = request.form.get('internal_phone') or None
+    city_phone = request.form.get('city_phone') or None
+    mobile_phone = request.form.get('mobile_phone') or None
+    home_phone = request.form.get('home_phone') or None
+    email = request.form.get('email') or None
+
+    if not employee_number:
+        print("❌ Ошибка: employee_number не указан")
+        return jsonify({"error": "Табельный номер не указан"}), 400
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"error": "Не удалось подключиться к базе данных"}), 500
+
+    try:
+        cursor = conn.cursor()
+
+        query = """
+            UPDATE phone_directory SET
+                full_name = %s,
+                position = %s,
+                internal_phone = %s,
+                city_phone = %s,
+                mobile_phone = %s,
+                home_phone = %s,
+                email = %s
+            WHERE employee_number = %s
+        """
+        cursor.execute(query, (
+            full_name, position, internal_phone, city_phone,
+            mobile_phone, home_phone, email, employee_number
+        ))
+
+        if cursor.rowcount == 0:
+            print(f"⚠️ Запись с employee_number={employee_number} не найдена для обновления")
+            return jsonify({"error": "Запись не найдена"}), 404
+
+        conn.commit()
+        print(f"✅ Успешно обновлена запись для {employee_number}")
+        return redirect('/phone_directory')
+
+    except Exception as e:
+        print(f"❌ Ошибка при обновлении: {e}")
+        return jsonify({"error": f"Ошибка базы данных: {e}"}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route("/add", methods=["GET", "POST"])
 def add_record():
     if request.method == "POST":

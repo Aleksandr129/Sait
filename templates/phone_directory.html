@@ -5,32 +5,89 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/4.0.9/jquery.inputmask.bundle.min.js"></script>
     <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            border: 2px solid #ddd;
-            font-family: Arial, sans-serif;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
         }
         h1 {
             text-align: center;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .back-button, .add-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .back-button:hover, .add-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background: white;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 1000px;
+            border: 1px solid #ddd;
+            font-family: Arial, sans-serif;
         }
         th, td {
-            border: 1px solid black;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: center;
+            white-space: nowrap;
         }
         th {
             background-color: #2185d0;
             color: white;
             font-weight: bold;
             text-transform: uppercase;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+        }
+        tr {
+            transition: all 0.2s ease;
         }
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #f8f9fa;
         }
         tr:hover {
             background-color: #91d4f5;
-            transition: background-color 0.3s ease;
+            transform: scale(1.01);
         }
         .edit-button {
             background-color: #ffc107;
@@ -42,185 +99,252 @@
             display: inline-block;
             font-size: 14px;
             margin: 4px 2px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .edit-button:hover {
             background-color: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); }
+            to { transform: translateY(0); }
         }
         .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
             font-weight: bold;
-        }
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
+            color: #888;
             cursor: pointer;
+            transition: color 0.2s;
         }
-        .modal-content form {
-            max-width: 600px;
-            margin: auto;
-            padding: 1em;
-            border: 1px solid #ccc;
-            border-radius: 1em;
+        .close-button:hover {
+            color: #333;
         }
-        .modal-content label {
+        .modal-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .modal-form label {
             display: block;
-            margin-top: 10px;
+            margin: 15px 0 5px;
+            font-weight: 600;
+            color: #444;
         }
-        .modal-content input, .modal-content select {
+        .modal-form input, .modal-form select {
             width: 100%;
-            padding: 8px;
-            margin-top: 5px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
             box-sizing: border-box;
         }
-        .modal-content button {
-            padding: 10px;
+        .modal-form input:focus, .modal-form select:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+        .modal-form button {
+            grid-column: 1 / -1;
+            padding: 12px;
             color: #fff;
             background-color: #007BFF;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: background-color 0.2s, transform 0.1s;
         }
-        .modal-content button:hover {
+        .modal-form button:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
         }
-        .back-button, .add-button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            margin: 4px 2px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .back-button:hover, .add-button:hover {
-            background-color: #0056b3;
+        @media (max-width: 768px) {
+            .modal-form {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                width: 95%;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Телефонный справочник</h1>
-    <button type="button" class="back-button" onclick="window.location.href='/employees'">Назад</button>
-    <button type="button" class="add-button" onclick="openAddModal()">Добавить</button>
-    <table>
-        <tr>
-            <th>Таб номер</th>
-            <th>ФИО</th>
-            <th>Должность</th>
-            <th>Внутренний телефон</th>
-            <th>Городской телефон</th>
-            <th>Сотовый телефон</th>
-            <th>Домашний телефон</th>
-            <th>E-Mail</th>
-            <th>Действия</th>
-        </tr>
-        {% for entry in phone_directory %}
-        <tr>
-            <td>{{ entry.employee_number }}</td>
-            <td>{{ entry.full_name }}</td>
-            <td>{{ entry.position }}</td>
-            <td>{{ entry.internal_phone }}</td>
-            <td>{{ entry.city_phone }}</td>
-            <td>{{ entry.mobile_phone }}</td>
-            <td>{{ entry.home_phone }}</td>
-            <td>{{ entry.email }}</td>
-            <td>
-                <button class="edit-button" onclick="openEditModal(
-                    '{{ entry.employee_number }}',
-                    '{{ entry.full_name }}',
-                    '{{ entry.position }}',
-                    '{{ entry.internal_phone }}',
-                    '{{ entry.city_phone }}',
-                    '{{ entry.mobile_phone }}',
-                    '{{ entry.home_phone }}',
-                    '{{ entry.email }}'
-                )">Изменить</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="container">
+        <h1>Телефонный справочник</h1>
+        <div class="buttons">
+            <button type="button" class="back-button" onclick="window.location.href='/employees'">Назад</button>
+            <button type="button" class="add-button" onclick="openAddModal()">Добавить</button>
+        </div>
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>Таб номер</th>
+                    <th>ФИО</th>
+                    <th>Должность</th>
+                    <th>Внутренний телефон</th>
+                    <th>Городской телефон</th>
+                    <th>Сотовый телефон</th>
+                    <th>Домашний телефон</th>
+                    <th>E-Mail</th>
+                    <th>Действия</th>
+                </tr>
+                {% for entry in phone_directory %}
+                <tr>
+                    <td>{{ entry.employee_number }}</td>
+                    <td>{{ entry.full_name }}</td>
+                    <td>{{ entry.position }}</td>
+                    <td>{{ entry.internal_phone }}</td>
+                    <td>{{ entry.city_phone }}</td>
+                    <td>{{ entry.mobile_phone }}</td>
+                    <td>{{ entry.home_phone }}</td>
+                    <td>{{ entry.email }}</td>
+                    <td>
+                        <button class="edit-button" onclick="openEditModal(
+                            '{{ entry.employee_number }}',
+                            '{{ entry.full_name }}',
+                            '{{ entry.position }}',
+                            '{{ entry.internal_phone }}',
+                            '{{ entry.city_phone }}',
+                            '{{ entry.mobile_phone }}',
+                            '{{ entry.home_phone }}',
+                            '{{ entry.email }}'
+                        )">Изменить</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeEditModal()">&times;</span>
-            <h2>Изменить контактную информацию</h2>
-            <form action="/update_phone_directory" method="post">
+            <h2 style="text-align: center; margin-bottom: 20px;">Изменить контактную информацию</h2>
+            <form action="/update_phone_directory" method="post" class="modal-form">
                 <input type="hidden" id="editEmployeeNumber" name="employee_number">
-                <label for="editFullName">ФИО:</label>
-                <input type="text" id="editFullName" name="full_name" required>
-                <label for="editPosition">Должность:</label>
-                <input type="text" id="editPosition" name="position" required>
-                <label for="editInternalPhone">Внутренний телефон:</label>
-                <input type="text" id="editInternalPhone" name="internal_phone">
-                <label for="editCityPhone">Городской телефон:</label>
-                <input type="text" id="editCityPhone" name="city_phone">
-                <label for="editMobilePhone">Сотовый телефон:</label>
-                <input type="text" id="editMobilePhone" name="mobile_phone">
-                <label for="editHomePhone">Домашний телефон:</label>
-                <input type="text" id="editHomePhone" name="home_phone">
-                <label for="editEmail">E-Mail:</label>
-                <input type="email" id="editEmail" name="email">
+                <div>
+                    <label for="editEmployeeNumberVisible">Табельный номер:</label>
+                    <input type="text" id="editEmployeeNumberVisible" name="employee_number_visible" readonly>
+                </div>
+                <div>
+                    <label for="editFullName">ФИО:</label>
+                    <input type="text" id="editFullName" name="full_name" required>
+                </div>
+                <div>
+                    <label for="editPosition">Должность:</label>
+                    <input type="text" id="editPosition" name="position" required>
+                </div>
+                <div>
+                    <label for="editInternalPhone">Внутренний телефон:</label>
+                    <input type="text" id="editInternalPhone" name="internal_phone">
+                </div>
+                <div>
+                    <label for="editCityPhone">Городской телефон:</label>
+                    <input type="text" id="editCityPhone" name="city_phone">
+                </div>
+                <div>
+                    <label for="editMobilePhone">Сотовый телефон:</label>
+                    <input type="text" id="editMobilePhone" name="mobile_phone">
+                </div>
+                <div>
+                    <label for="editHomePhone">Домашний телефон:</label>
+                    <input type="text" id="editHomePhone" name="home_phone">
+                </div>
+                <div>
+                    <label for="editEmail">E-Mail:</label>
+                    <input type="email" id="editEmail" name="email">
+                </div>
                 <button type="submit">Сохранить</button>
             </form>
         </div>
     </div>
+
+    <!-- Add Modal -->
     <div id="addModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeAddModal()">&times;</span>
-            <h2>Добавить контактную информацию</h2>
-            <form action="/add_phone_directory" method="post">
-                <label for="addEmployeeNumber">Табельный номер:</label>
-                <select id="addEmployeeNumber" name="employee_number" onchange="populateEmployeeData(this.value)" required>
-                    <option value="">Выберите табельный номер</option>
-                    {% for employee in employees %}
-                    <option value="{{ employee.employee_number }}">{{ employee.employee_number }}</option>
-                    {% endfor %}
-                </select>
-                <label for="addFullName">ФИО:</label>
-                <input type="text" id="addFullName" name="full_name" required>
-                <label for="addPosition">Должность:</label>
-                <input type="text" id="addPosition" name="position" required>
-                <label for="addInternalPhone">Внутренний телефон:</label>
-                <input type="text" id="addInternalPhone" name="internal_phone">
-                <label for="addCityPhone">Городской телефон:</label>
-                <input type="text" id="addCityPhone" name="city_phone">
-                <label for="addMobilePhone">Сотовый телефон:</label>
-                <input type="text" id="addMobilePhone" name="mobile_phone">
-                <label for="addHomePhone">Домашний телефон:</label>
-                <input type="text" id="addHomePhone" name="home_phone">
-                <label for="addEmail">E-Mail:</label>
-                <input type="email" id="addEmail" name="email">
+            <h2 style="text-align: center; margin-bottom: 20px;">Добавить контактную информацию</h2>
+            <form action="/add_phone_directory" method="post" class="modal-form">
+                <div>
+                    <label for="addEmployeeNumber">Табельный номер:</label>
+                    <select id="addEmployeeNumber" name="employee_number" onchange="populateEmployeeData(this.value)" required>
+                        <option value="">Выберите табельный номер</option>
+                        {% for employee in employees %}
+                        <option value="{{ employee.employee_number }}">{{ employee.employee_number }} — {{ employee.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="addFullName">ФИО:</label>
+                    <input type="text" id="addFullName" name="full_name" required readonly>
+                </div>
+                <div>
+                    <label for="addPosition">Должность:</label>
+                    <input type="text" id="addPosition" name="position" required readonly>
+                </div>
+                <div>
+                    <label for="addInternalPhone">Внутренний телефон:</label>
+                    <input type="text" id="addInternalPhone" name="internal_phone">
+                </div>
+                <div>
+                    <label for="addCityPhone">Городской телефон:</label>
+                    <input type="text" id="addCityPhone" name="city_phone">
+                </div>
+                <div>
+                    <label for="addMobilePhone">Сотовый телефон:</label>
+                    <input type="text" id="addMobilePhone" name="mobile_phone">
+                </div>
+                <div>
+                    <label for="addHomePhone">Домашний телефон:</label>
+                    <input type="text" id="addHomePhone" name="home_phone">
+                </div>
+                <div>
+                    <label for="addEmail">E-Mail:</label>
+                    <input type="email" id="addEmail" name="email">
+                </div>
                 <button type="submit">Добавить</button>
             </form>
         </div>
     </div>
+
     <script>
         $(document).ready(function() {
             $('#editMobilePhone').inputmask('+7 (999) 999-99-99');
@@ -232,8 +356,11 @@
             $('#editHomePhone').inputmask('9-99-99');
             $('#addHomePhone').inputmask('9-99-99');
         });
+
+        // ✅ Исправленная функция: устанавливает employee_number
         function openEditModal(employeeNumber, fullName, position, internalPhone, cityPhone, mobilePhone, homePhone, email) {
             document.getElementById('editEmployeeNumber').value = employeeNumber;
+            document.getElementById('editEmployeeNumberVisible').value = employeeNumber;
             document.getElementById('editFullName').value = fullName;
             document.getElementById('editPosition').value = position;
             document.getElementById('editInternalPhone').value = internalPhone;
@@ -243,23 +370,31 @@
             document.getElementById('editEmail').value = email;
             document.getElementById('editModal').style.display = 'block';
         }
+
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
         }
+
         function openAddModal() {
             document.getElementById('addModal').style.display = 'block';
         }
+
         function closeAddModal() {
             document.getElementById('addModal').style.display = 'none';
         }
+
+        // Автозаполнение при выборе сотрудника
         function populateEmployeeData(employeeNumber) {
+            if (!employeeNumber) return;
             fetch(`/get_employee_data?employee_number=${employeeNumber}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('addFullName').value = data.full_name;
-                    document.getElementById('addPosition').value = data.position;
+                    if (data.full_name && data.position) {
+                        document.getElementById('addFullName').value = data.full_name;
+                        document.getElementById('addPosition').value = data.position;
+                    }
                 })
-                .catch(error => console.error('Ошибка:', error));
+                .catch(err => console.error('Ошибка при получении данных сотрудника:', err));
         }
     </script>
 </body>
